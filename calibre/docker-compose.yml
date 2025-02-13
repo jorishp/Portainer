@@ -1,0 +1,18 @@
+services:
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1030
+      - PGID=100
+      - TZ=Europe/Amsterdam
+      - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - /volume1/docker/calibre/:/config
+      - /volume1/Administratie/certificaat:/certificate
+      - /volume1/video2/books/:/books
+    network_mode: bridge
+    ports:
+      -8083:8083
+    restart: unless-stopped
