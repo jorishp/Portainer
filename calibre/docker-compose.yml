@@ -10,7 +10,7 @@ services:
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
     volumes:
       - /volume1/docker/calibre/:/config
-      - /volume1/Administratie/certificaat:/certificate
+      - /volume1/Administratie/certificaat:/certificate   
       - /volume1/video2/books/:/books
     network_mode: bridge
     ports:
