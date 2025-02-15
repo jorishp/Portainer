@@ -21,7 +21,8 @@ services:
       - '27015:27015' # Default SRCDS port
       - '25565:25565' # Default Minecraft Java port
 networks:
-  default:
+  puffer:
+  bridge:
     ipam:
       config:
         - subnet: 172.22.0.0/24
