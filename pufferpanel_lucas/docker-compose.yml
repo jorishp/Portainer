@@ -18,7 +18,7 @@ services:
       - './var/lib/pufferpanel:/var/lib/pufferpanel' # Data folder
       - '/var/run/docker.sock:/var/run/docker.sock' # Docker socket, leave this in.
     ports:
-      - '8080:8080' # Panel port
+      - '8088:8080' # Panel port
       - '5657:5657' # SFTP port
       - '27015:27015' # Default SRCDS port
       - '25565:25565' # Default Minecraft Java port
