@@ -24,6 +24,7 @@ services:
       - '25565:25565' # Default Minecraft Java port
 networks:
   puffer:
+  name: puffer
   bridge:
     ipam:
       config:
