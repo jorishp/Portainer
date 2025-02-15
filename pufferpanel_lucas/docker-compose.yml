@@ -23,9 +23,12 @@ services:
       - '27015:27015' # Default SRCDS port
       - '25565:25565' # Default Minecraft Java port
 networks:
-  puffero:
-  name: puffer0
-  bridge:
+  puffer0:
+    name: puffer0
+    driver: bridge
     ipam:
       config:
-        - subnet: 172.22.0.0/24
+        - subnet: "172.22.0.0/24"
+    driver_opts:
+      com.docker.network.bridge.name: puffer0
+  
