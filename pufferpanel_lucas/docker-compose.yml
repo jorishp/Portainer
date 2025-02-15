@@ -1,5 +1,3 @@
-ersion: '3'
-
 services:
   pufferpanel:
     image: ghcr.io/oskardotglobal/pufferpanel:arm64
