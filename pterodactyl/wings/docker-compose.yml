@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   wings:
     image: ghcr.io/pterodactyl/wings:v1.6.1
