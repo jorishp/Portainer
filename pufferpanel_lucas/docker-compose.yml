@@ -1,6 +1,6 @@
 services:
   pufferpanel:
-    image: pufferpanel/pufferpanel
+    image: jorisvos037/pufferpanel
     #build: .
     container_name: pufferpanel
     networks:
