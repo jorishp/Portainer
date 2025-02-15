@@ -3,6 +3,8 @@ services:
     image: pufferpanel/pufferpanel
     #build: .
     container_name: pufferpanel
+    networks:
+      - puffer
     restart: on-failure
     environment:
       - 'PUFFER_LOGS=/etc/pufferpanel/logs' # Location of your logs
