@@ -1,6 +1,6 @@
 services:
   pufferpanel:
-    image: ghcr.io/oskardotglobal/pufferpanel:arm64
+    image: pufferpanel/pufferpanel
     #build: .
     container_name: pufferpanel
     restart: on-failure
