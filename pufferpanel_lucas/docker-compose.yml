@@ -22,7 +22,8 @@ services:
       - '5657:5657' # SFTP port
       - '27015:27015' # Default SRCDS port
       - '25565:25565' # Default Minecraft Java port
-#networks:
- # ipvlan3:
-  #  driver: ipvlan
+networks:
+  ipvlan3:
+    external: true
+    name: ipvlan3
   
