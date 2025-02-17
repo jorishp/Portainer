@@ -3,8 +3,8 @@ services:
     image: jorisvos037/pufferpanel
     #build: .
     container_name: pufferpanel
-    #networks:
-     # - ipvlan3
+    networks:
+     - ipvlan3
     restart: on-failure
     environment:
       - 'PUFFER_LOGS=/etc/pufferpanel/logs' # Location of your logs
@@ -22,7 +22,7 @@ services:
       - '5657:5657' # SFTP port
       - '27015:27015' # Default SRCDS port
       - '25565:25565' # Default Minecraft Java port
-networks:
-  ipvlan3:
-    driver: ipvlan
+#networks:
+ # ipvlan3:
+  #  driver: ipvlan
   
