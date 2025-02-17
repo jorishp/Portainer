@@ -78,8 +78,8 @@ services:
     restart: always
     # For NGINX Reverse Proxy, I will be using these ports for simplicity.
     ports:
-      - "802:80"
-      - "4432:443"
+      - "80:80"
+      - "443:443"
     # Links these containers together in a docker network.
     links:
       - database
