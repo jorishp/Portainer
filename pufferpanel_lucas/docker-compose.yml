@@ -4,7 +4,7 @@ services:
     #build: .
     container_name: pufferpanel
     networks:
-      - puffer0
+      - macvlan3
     restart: on-failure
     environment:
       - 'PUFFER_LOGS=/etc/pufferpanel/logs' # Location of your logs
