@@ -3,8 +3,8 @@ services:
     image: jorisvos037/pufferpanel
     #build: .
     container_name: pufferpanel
-    networks:
-      - ipvlan3
+    #networks:
+     # - ipvlan3
     restart: on-failure
     environment:
       - 'PUFFER_LOGS=/etc/pufferpanel/logs' # Location of your logs
