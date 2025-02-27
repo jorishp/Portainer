@@ -11,7 +11,7 @@ x-common:
     &panel-environment
     #This is the URL that your panel will be on after being reverse proxied.
     # set this to "https://yoursubdomain.yourdomain.yourdomainstld"
-    APP_URL: "https://pterodactyl.broekkant.nl"
+    APP_URL: "https://home.broekkant.nl:3333"
     # A list of valid timezones can be found here:
     # http://php.net/manual/en/timezones.php
     APP_TIMEZONE: "America/New_York"
