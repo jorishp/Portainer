@@ -111,7 +111,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: "172,18.0.0/16"
+        - subnet: "172.18.0.0/16"
           gateway: "172.18.0.1"
     driver_opts:
       com.docker.network.bridge.name: ptero0
