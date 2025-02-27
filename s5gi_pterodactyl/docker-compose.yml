@@ -61,6 +61,8 @@ services:
   database:
     image: mariadb:10.5
     restart: always
+    networks:
+      - ptero1
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - "/opt/pterodactyl/panel/database:/var/lib/mysql"
@@ -72,10 +74,14 @@ services:
   cache:
     image: redis:alpine
     restart: always
+    networks:
+      - ptero1
   # Now the fun part. Your actual panel.
   panel:
     image: ghcr.io/pterodactyl/panel:latest
     restart: always
+    networks:
+      - ptero1
     # For NGINX Reverse Proxy, I will be using these ports for simplicity.
     ports:
       - "80:80"
@@ -115,3 +121,13 @@ networks:
           gateway: "172.18.0.1"
     driver_opts:
       com.docker.network.bridge.name: ptero0
+    ptero1:
+    name: ptero1
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.20.0.0/16"
+          gateway: "172.20.0.1"
+    driver_opts:
+      com.docker.network.bridge.name: ptero1
+    
