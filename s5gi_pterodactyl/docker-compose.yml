@@ -35,7 +35,8 @@ services:
   wings:
     image: ghcr.io/pterodactyl/wings:latest
     restart: always
-    network_mode: bridge
+    networks:
+      - ptero0
     # These are the ports exposed by Wings, I don't recommend changing them.
     ports:
       - "8080:8080"
