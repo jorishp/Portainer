@@ -35,8 +35,6 @@ services:
   wings:
     image: ghcr.io/pterodactyl/wings:latest
     restart: always
-    networks:
-      - ptero0
     # These are the ports exposed by Wings, I don't recommend changing them.
     ports:
       - "8080:8080"
@@ -111,6 +109,17 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: "172.24.0.0/16"
+        - subnet: "192.55.0.0/16"
+          gateway: "192.55.0.1"
     driver_opts:
       com.docker.network.bridge.name: ptero0
+  ptero1:
+    name: ptero1
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.20.0.0/16"
+          gateway: "172.20.0.1"
+    driver_opts:
+      com.docker.network.bridge.name: ptero1
+    
