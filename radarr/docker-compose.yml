@@ -1,0 +1,17 @@
+services:
+  Radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1030
+      - PGID=100
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/volume1/docker/radar:/config
+      - /mnt/volume1/video2:/video2
+      - /mnt/volume1/Administratie/certificaat:/certificate
+    ports:
+      - 8310:7878
+      - 8311:8311      
+    network_mode: bridge
+    restart: unless-stopped

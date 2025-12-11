@@ -1,0 +1,17 @@
+version: '2'
+services:
+  homebridge:
+    image: homebridge/homebridge:latest
+    container_name: homebridge
+    restart: always
+    network_mode: host
+    volumes:
+      - /mnt/volume1/docker/homebridge/:/homebridge
+      - /mnt/volume1/Administratie/certificaat:/certificate
+    ports:
+      - 8581:8581
+    logging:
+      driver: json-file
+      options:
+        max-size: "10mb"
+        max-file: "1"
