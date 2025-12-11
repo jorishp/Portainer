@@ -1,0 +1,18 @@
+services:
+  linuxserver-sabnzbd:
+    image: linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1030
+      - PGID=100
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /volume1/docker/sabnzbd:/config
+      - /volume1/video:/video
+      - /volume1/video2:/video2
+      - /volume1/downloads:/downloads
+      - /volume1/Administratie/certificaat:/certificate
+    ports:
+      - "8080:8080"    # Web UI
+      - "9090:9090"    # HTTPS (optioneel)
+    restart: unless-stopped
