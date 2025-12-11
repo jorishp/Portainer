@@ -1,0 +1,17 @@
+services:
+  Sonarr:
+    image: linuxserver/sonarr:develop
+    container_name: sonarr_v4
+    environment:
+      - PUID=1030
+      - PGID=100
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /volume1/docker/sonarr_v4:/config
+      - /volume1/video:/video
+      - /volume1/Administratie/certificaat:/certificate
+    ports:
+      - 8989:8989
+      - 9898:9898      
+    network_mode: bridge
+    restart: unless-stopped
