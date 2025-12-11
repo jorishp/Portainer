@@ -1,5 +1,35 @@
-services:
+version: "3.9"
 
-plex:
-  image: linuxserver/plex
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest   # of linuxserver/plex
+    container_name: plex
+    restart: unless-stopped
+
+    ports:
+      - "32400:32400"
+      - "3005:3005"
+      - "8324:8324"
+      - "32469:32469"
+      - "1900:1900/udp"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+
+    environment:
+      - PUID=1000              # pas aan naar jouw user
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+      - VERSION=docker
+
+    volumes:
+      - /srv/plex/config:/config
+      - /mnt/media/movies:/movies
+      - /mnt/media/series:/series
+
+    # Optioneel: hardware transcoding
+    devices:
+      - /dev/dri:/dev/dri
+
   
