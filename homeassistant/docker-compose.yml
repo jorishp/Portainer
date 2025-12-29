@@ -1,0 +1,14 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    environment:
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/volume1/docker/homeassistant:/config
+      - /run/dbus:/run/dbus:ro
+    devices:
+      - /dev/serial/by-id/usb-AEO_Z-STICK_10-if00:/dev/serial/by-id/usb-AEO_Z-STICK_10-if00
