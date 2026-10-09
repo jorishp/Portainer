@@ -7,8 +7,8 @@ services:
       - PGID=100
       - TZ=Europe/Amsterdam
     volumes:
-      - /volume1/docker/sonarr_v4:/config
-      - /volume1/video:/video
+      - /mnt/docker/sonarr_v4:/config
+      - /mnt/video:/video
       - /volume1/Administratie/certificaat:/certificate
     ports:
       - 8989:8989
