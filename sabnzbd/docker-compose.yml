@@ -7,10 +7,10 @@ services:
       - PGID=100
       - TZ=Europe/Amsterdam
     volumes:
-      - /volume1/docker/sabnzbd:/config
-      - /volume1/video:/video
-      - /volume1/video2:/video2
-      - /volume1/downloads:/downloads
+      - /mnt/docker/sabnzbd:/config
+      - /mnt/video:/video
+      - /mnt/video2:/video2
+      - /mnt/downloads:/downloads
       - /volume1/Administratie/certificaat:/certificate
     ports:
       - "8080:8080"    # Web UI
