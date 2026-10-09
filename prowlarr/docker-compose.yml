@@ -8,7 +8,7 @@ services:
       - TZ=Europe/Amsterdam
     volumes:
       - /mnt/Administratie/certificaat:/certificate      
-      - /mnt/docker/prowlarr:/config
+      - /opt/appdata/prowlarr:/config
     network_mode: bridge
     ports:
       - 9696:9696
