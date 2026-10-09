@@ -7,7 +7,7 @@ services:
       - PGID=100
       - TZ=Europe/Amsterdam
     volumes:
-      - /mnt/docker/radar:/config
+      - //opt/appdata/radar:/config
       - /mnt/video2:/video2
       - /mnt/Administratie/certificaat:/certificate
     ports:
