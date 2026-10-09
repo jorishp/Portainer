@@ -1,0 +1,16 @@
+services:
+  linuxserver-prowlarr:
+    image: linuxserver/prowlarr:develop
+    container_name: prowlarr
+    environment:
+      - PUID=1030
+      - PGID=100
+      - TZ=Europe/Amsterdam
+    volumes:
+      - /mnt/Administratie/certificaat:/certificate      
+      - /mnt/docker/prowlarr:/config
+    network_mode: bridge
+    ports:
+      - 9696:9696
+      - 6969:6969
+    restart: unless-stopped
