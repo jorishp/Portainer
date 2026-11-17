@@ -1,6 +1,6 @@
 services:
   evoweb:
-    image: ghcr.io/jorishp/evoweb:0.9.4-sec20261117-1
+    image: ghcr.io/jorishp/evoweb:0.9.4-live20261117-1
     pull_policy: always
     container_name: evoweb-git
     restart: unless-stopped
@@ -11,9 +11,12 @@ services:
       NODE_ENV: production
       PORT: "3330"
       DEBUG: "false"
-      HEATING_PROVIDER: mock
-      HONEYWELL_USERNAME: ""
-      HONEYWELL_PASSWORD: ""
+      HEATING_PROVIDER: ${HEATING_PROVIDER:-mock}
+      HONEYWELL_USERNAME: ${HONEYWELL_USERNAME:-}
+      HONEYWELL_PASSWORD: ${HONEYWELL_PASSWORD:-}
+      EVOWEB_WEB_USERNAME: ${EVOWEB_WEB_USERNAME:-evohome}
+      EVOWEB_WEB_PASSWORD: ${EVOWEB_WEB_PASSWORD:-}
+      EVOWEB_PUBLIC_ORIGIN: ${EVOWEB_PUBLIC_ORIGIN:-}
       HONEYWELL_URL_DOMAIN: https://tccna.resideo.com
       MQTT_BROKER_URL: mqtt://127.0.0.1:1883
       MQTT_RECONNECT_PERIOD: "0"
