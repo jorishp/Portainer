@@ -1,0 +1,46 @@
+services:
+  evoweb:
+    image: ghcr.io/jorishp/evoweb:0.9.4-sec20261117-1
+    pull_policy: always
+    container_name: evoweb-git
+    restart: unless-stopped
+    ports:
+      - "${EVOWEB_BIND_IP:-192.168.0.94}:${EVOWEB_PORT:-3330}:3330"
+    environment:
+      TZ: Europe/Amsterdam
+      NODE_ENV: production
+      PORT: "3330"
+      DEBUG: "false"
+      HEATING_PROVIDER: mock
+      HONEYWELL_USERNAME: ""
+      HONEYWELL_PASSWORD: ""
+      HONEYWELL_URL_DOMAIN: https://tccna.resideo.com
+      MQTT_BROKER_URL: mqtt://127.0.0.1:1883
+      MQTT_RECONNECT_PERIOD: "0"
+      MQTT_CONNECT_TIMEOUT: "1000"
+      MQTT_SAVE_MODE: week
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        ln -sfn /app/data/honeywell-session.json /app/.session.json
+        exec node dist/index.js
+    volumes:
+      - evoweb_data:/app/data
+      - evoweb_logs:/app/logs
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  evoweb_data:
+    external: true
+    name: ${EVOWEB_DATA_VOLUME:-evoweb_evoweb_data}
+  evoweb_logs:
+    external: true
+    name: ${EVOWEB_LOGS_VOLUME:-evoweb_evoweb_logs}

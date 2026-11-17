@@ -1,0 +1,11 @@
+node_modules
+dist
+static
+frontend/node_modules
+frontend/dist
+.git
+.env
+*.log
+.session.json
+legacy_backup
+tests
