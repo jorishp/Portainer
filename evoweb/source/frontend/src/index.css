@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  --notification-bg: #1e293b;
+  --notification-color: #ffffff;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8fafc; /* slate-50 */
+}
+
+.dark {
+  --color-slate-900: #121213;
+  --color-slate-800: #1c1c1d;
+  --color-slate-700: #2c2c2d;
+  --notification-bg: #383838;
+  --notification-color: #ffffff;
+}
+
+.dark body {
+  background-color: #121213;
+}

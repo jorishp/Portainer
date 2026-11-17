@@ -1,0 +1,86 @@
+name: evoWeb image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'evoweb/source/**'
+      - 'evoweb/smoke-test.cjs'
+      - 'evoweb/VERSION'
+      - '.github/workflows/evoweb.yml'
+  pull_request:
+    paths:
+      - 'evoweb/source/**'
+      - 'evoweb/smoke-test.cjs'
+      - 'evoweb/VERSION'
+      - '.github/workflows/evoweb.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evoweb-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/jorishp/evoweb
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Read release version
+        shell: bash
+        run: |
+          version="$(tr -d '\r\n' < evoweb/VERSION)"
+          [[ "$version" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ ]]
+          echo "IMAGE_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build and audit dependencies
+        run: |
+          docker build --pull \
+            --label "org.opencontainers.image.source=https://github.com/jorishp/Portainer" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.version=$IMAGE_VERSION" \
+            --tag "$IMAGE:sha-$GITHUB_SHA" \
+            --tag "$IMAGE:$IMAGE_VERSION" \
+            evoweb/source
+
+      - name: Test demo read, save and reload
+        run: |
+          docker run --detach --name evoweb-ci \
+            --env HEATING_PROVIDER=mock \
+            --env HONEYWELL_USERNAME= \
+            --env HONEYWELL_PASSWORD= \
+            --env MQTT_BROKER_URL=mqtt://127.0.0.1:1883 \
+            --env MQTT_RECONNECT_PERIOD=0 \
+            --env MQTT_CONNECT_TIMEOUT=1000 \
+            --env MQTT_SAVE_MODE=week \
+            "$IMAGE:sha-$GITHUB_SHA"
+          docker exec --interactive evoweb-ci node < evoweb/smoke-test.cjs
+
+      - name: Publish tested image
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          docker push "$IMAGE:sha-$GITHUB_SHA"
+          docker push "$IMAGE:$IMAGE_VERSION"
+
+      - name: Failure diagnostics
+        if: failure()
+        run: docker logs evoweb-ci || true
+
+      - name: Stop CI demo
+        if: always()
+        run: docker rm --force evoweb-ci || true
