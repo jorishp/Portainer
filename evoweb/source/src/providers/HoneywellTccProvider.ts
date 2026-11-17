@@ -102,6 +102,7 @@ export class HoneywellTccProvider implements HeatingProvider {
     try {
       if (fs.existsSync(SESSION_FILE)) {
         const data = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
+        if (data.accountUsername !== this.config.username) return false;
         this.credentials = {
           ...data,
           expires: DateTime.fromISO(data.expires)
@@ -120,13 +121,15 @@ export class HoneywellTccProvider implements HeatingProvider {
   private saveSession(): void {
     try {
       const data = {
+        accountUsername: this.config.username,
         accessToken: this.credentials?.accessToken,
         refreshToken: this.credentials?.refreshToken,
         expires: this.credentials?.expires.toISO(),
         tokenType: this.credentials?.tokenType,
         lastFullLogin: this.lastFullLogin?.toISO()
       };
-      fs.writeFileSync(SESSION_FILE, JSON.stringify(data, null, 2));
+      fs.writeFileSync(SESSION_FILE, JSON.stringify(data, null, 2), { mode: 0o600 });
+      fs.chmodSync(SESSION_FILE, 0o600);
     } catch (e) {
       Logger.error("Honeywell TCC: Failed to save session file.", e);
     }

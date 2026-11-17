@@ -6,12 +6,14 @@ on:
     paths:
       - 'evoweb/source/**'
       - 'evoweb/smoke-test.cjs'
+      - 'evoweb/security-smoke-test.cjs'
       - 'evoweb/VERSION'
       - '.github/workflows/evoweb.yml'
   pull_request:
     paths:
       - 'evoweb/source/**'
       - 'evoweb/smoke-test.cjs'
+      - 'evoweb/security-smoke-test.cjs'
       - 'evoweb/VERSION'
       - '.github/workflows/evoweb.yml'
   workflow_dispatch:
@@ -68,6 +70,24 @@ jobs:
             "$IMAGE:sha-$GITHUB_SHA"
           docker exec --interactive evoweb-ci node < evoweb/smoke-test.cjs
 
+      - name: Test protected access and private credential handling
+        run: |
+          docker run --detach --name evoweb-auth-ci \
+            --env HEATING_PROVIDER=mock \
+            --env HONEYWELL_USERNAME= \
+            --env HONEYWELL_PASSWORD= \
+            --env EVOWEB_WEB_USERNAME=ci-user \
+            --env EVOWEB_WEB_PASSWORD=ci-only-not-a-real-secret \
+            "$IMAGE:sha-$GITHUB_SHA"
+          docker exec --interactive evoweb-auth-ci node < evoweb/security-smoke-test.cjs
+          if docker run --rm --env HEATING_PROVIDER=honeywell \
+            --env HONEYWELL_USERNAME=fixture-user --env HONEYWELL_PASSWORD=fixture-password \
+            "$IMAGE:sha-$GITHUB_SHA" > guard.log 2>&1; then
+            echo 'Live startup without a separate web password must fail'
+            exit 1
+          fi
+          grep -q EVOWEB_WEB_PASSWORD guard.log
+
       - name: Publish tested image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
@@ -79,8 +99,10 @@ jobs:
 
       - name: Failure diagnostics
         if: failure()
-        run: docker logs evoweb-ci || true
+        run: |
+          docker logs evoweb-ci || true
+          docker logs evoweb-auth-ci || true
 
       - name: Stop CI demo
         if: always()
-        run: docker rm --force evoweb-ci || true
+        run: docker rm --force evoweb-ci evoweb-auth-ci || true

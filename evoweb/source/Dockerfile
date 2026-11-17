@@ -22,8 +22,8 @@ RUN npm run build
 FROM node:22-slim
 LABEL org.opencontainers.image.title="evoweb" \
       org.opencontainers.image.description="evoWeb Heating Schedule Manager" \
-      org.opencontainers.image.version="0.9.4-sec20261117-1" \
-      org.opencontainers.image.revision="05f2f7280f3b0be30e2a768771b2aee7bc74261c+security-20261117-1"
+      org.opencontainers.image.version="0.9.4-live20261117-1" \
+      org.opencontainers.image.revision="05f2f7280f3b0be30e2a768771b2aee7bc74261c+live-config-20261117-1"
 WORKDIR /app
 
 # Copy backend dependencies
@@ -42,7 +42,7 @@ COPY data/ ./data/
 EXPOSE 3330
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3330/', {signal: AbortSignal.timeout(3000)}).then(r => {if (!r.ok) process.exit(1)}).catch(() => process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:3330/healthz', {signal: AbortSignal.timeout(3000)}).then(r => {if (!r.ok) process.exit(1)}).catch(() => process.exit(1))"
 
 # Start from the dist folder
 CMD ["npm", "run", "start:evoweb"]
