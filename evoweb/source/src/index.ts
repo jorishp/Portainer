@@ -7,8 +7,12 @@ import { HeatingProvider } from './providers/HeatingProvider';
 import { HoneywellTccProvider } from './providers/HoneywellTccProvider';
 import { MqttProvider } from './providers/MqttProvider';
 import { MockProvider } from './providers/MockProvider';
+import { validateLiveConfiguration, webAccess } from './utils/WebAccess';
 
+validateLiveConfiguration(config.providerType, config.honeywell.username, config.honeywell.password, config.webAccess);
 const app = express();
+app.get('/healthz', (_req, res) => { res.json({ status: 'ok' }); });
+app.use(webAccess(config.webAccess));
 
 // --- Provider instances ---
 let activeProvider: HeatingProvider;
@@ -53,7 +57,7 @@ async function initAllProviders(): Promise<void> {
     Logger.info('Initializing providers...');
     const tasks: Array<Promise<void>> = [];
 
-    if (hasValidMqttConfig()) {
+    if (config.providerType !== 'mock' && hasValidMqttConfig()) {
         tasks.push((async () => {
             try {
                 mqttProvider = new MqttProvider(config.mqtt);
@@ -68,7 +72,7 @@ async function initAllProviders(): Promise<void> {
         Logger.info('MQTT provider skipped: MQTT_BROKER_URL not configured');
     }
 
-    if (hasValidCloudConfig()) {
+    if (config.providerType !== 'mock' && hasValidCloudConfig()) {
         tasks.push((async () => {
             try {
                 cloudProvider = new HoneywellTccProvider(config.honeywell);
@@ -84,11 +88,17 @@ async function initAllProviders(): Promise<void> {
     }
 
     await Promise.allSettled(tasks);
+    if (config.providerType === 'honeywell' && !cloudProvider) {
+        throw new Error('Honeywell initialization failed; check the login details in Portainer');
+    }
     setActiveProvider(config.providerType);
     Logger.info(`Active provider set to: ${config.providerType}`);
 }
 
-initAllProviders();
+initAllProviders().catch(error => {
+    Logger.error('Provider initialization failed.', error);
+    process.exit(1);
+});
 
 // --- Middleware ---
 app.use(express.json());
@@ -96,12 +106,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
     Logger.debug(`${req.method} ${req.url}`);
-    next();
-});
-
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
     next();
 });
 
@@ -308,7 +312,7 @@ app.get('/rest/config', (req, res) => {
     res.json(config.scheduler);
 });
 
-app.get('/rest/renewsession', async (req, res) => {
+app.post('/rest/renewsession', async (req, res) => {
     try {
         await activeProvider.renewSession();
         res.json(activeProvider.getSessionInfo());
@@ -565,7 +569,7 @@ app.get('/rest/api', (req, res) => {
 <tr><td><span class="method get">GET</span></td><td class="path">/rest/test</td><td class="desc">Connectivity check — returns <code>{"status":"ok"}</code></td></tr>
 <tr><td><span class="method get">GET</span></td><td class="path">/rest/session</td><td class="desc">Active provider session info</td></tr>
 <tr><td><span class="method get">GET</span></td><td class="path">/rest/config</td><td class="desc">Frontend / scheduler UI configuration</td></tr>
-<tr><td><span class="method get">GET</span></td><td class="path">/rest/renewsession</td><td class="desc">Force session renewal / reconnect</td></tr>
+<tr><td><span class="method post">POST</span></td><td class="path">/rest/renewsession</td><td class="desc">Force session renewal / reconnect</td></tr>
 <tr><td><span class="method post">POST</span></td><td class="path">/rest/selectprovider</td><td class="desc">Switch active provider<p class="note">Body: <span class="param">{"type":"honeywell"|"mqtt"|"mock"}</span></p></td></tr>
 </table>
 

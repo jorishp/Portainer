@@ -8,6 +8,11 @@ export const config = {
   env: process.env.NODE_ENV || 'development',
   debug: process.env.DEBUG === 'true',
   providerType: process.env.HEATING_PROVIDER || 'honeywell',
+  webAccess: {
+    username: process.env.EVOWEB_WEB_USERNAME || 'evohome',
+    password: process.env.EVOWEB_WEB_PASSWORD || '',
+    origin: process.env.EVOWEB_PUBLIC_ORIGIN || '',
+  },
   
   honeywell: {
     username: process.env.HONEYWELL_USERNAME,

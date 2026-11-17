@@ -868,6 +868,11 @@ export const Scheduler: React.FC = () => {
 
   return (
     <section className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col min-h-[600px] p-2 md:p-8">
+      <p role="status" className="mb-3 text-xs font-bold text-slate-600 dark:text-slate-300">
+        {provider?.name === 'Mock' ? 'DEMO · voorbeeldschema’s' :
+          provider?.name === 'Honeywell' ? 'LIVE · Honeywell — opslaan wijzigt je echte schema' :
+          provider?.name === 'MQTT' ? 'LIVE · MQTT' : 'Bron laden…'}
+      </p>
       <header className="mb-4 flex items-center gap-2 sm:gap-3">
         <div
           ref={refs.setReference}

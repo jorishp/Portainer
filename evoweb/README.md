@@ -1,23 +1,42 @@
-# evoWeb — schema-editor voor Evohome (DEMO)
+# evoWeb — schema-editor voor Evohome
 
 Deze map bevat een zelfstandig bouwbare versie van [smar000/evohome-Scheduler-GUI](https://github.com/smar000/evohome-Scheduler-GUI), gebaseerd op bronrevisie `05f2f7280f3b0be30e2a768771b2aee7bc74261c` (0.9.4), met bijgewerkte npm-afhankelijkheden.
 
-De deployment gebruikt **uitsluitend demogegevens**. Honeywell-inlogvelden zijn leeg. De webapp heeft geen eigen toegangsbeveiliging voor echte verwarmingsgegevens; de proef is bedoeld voor het lokale netwerk.
+De deployment start standaard met **demogegevens**. Voor livegebruik kunnen de Honeywell-gegevens in Portainer worden ingevuld. Livegebruik vereist een apart wachtwoord voor de webeditor. Gebruik de HTTP-pagina alleen op je vertrouwde lokale netwerk; voor toegang via internet is HTTPS met een goed ingestelde proxy nodig.
 
 ## Bouw en publicatie
 
 Workflow: [evoWeb image](https://github.com/jorishp/Portainer/actions/workflows/evoweb.yml).
 
-Bij wijzigingen aan `evoweb/source`, `evoweb/smoke-test.cjs`, `evoweb/VERSION` of de workflow:
+Bij wijzigingen aan `evoweb/source`, de proefscripts, `evoweb/VERSION` of de workflow:
 
 1. GitHub bouwt de frontend en backend met de vastgelegde lockfiles en een actuele Node 22-basisimage.
 2. Alle npm-afhankelijkheden worden op bekende kwetsbaarheden gecontroleerd; een gevonden kwetsbaarheid blokkeert de bouw.
 3. Een tijdelijke democontainer test de webinterface en het lezen, opslaan en teruglezen van een volledig weekschema.
+   Een tweede tijdelijke container test de webaanmelding, bescherming tegen opdrachten vanaf andere websites, de logprivacy en de sessieopslag. Deze controles gebruiken uitsluitend testgegevens en maken geen Honeywell-verbinding.
 4. Na een geslaagde bouw op `main` verschijnt de image in `ghcr.io/jorishp/evoweb`, met zowel de releaseversie uit `VERSION` als `sha-<Git-commit>` als tag. Pull requests bouwen en testen zonder publicatie.
 
 De workflow gebruikt het tijdelijke `GITHUB_TOKEN`. Er zijn geen persoonlijke tokens of Portainer-/Honeywell-wachtwoorden nodig in de repository. Het GHCR-package moet na de eerste publicatie openbaar zijn voor anoniem ophalen door Portainer.
 
-Bij later livegebruik horen de Honeywell-gebruikersnaam en het wachtwoord in Portainer-stackvariabelen, na een afzonderlijke aanpassing voor de liveprovider. Ze mogen niet in deze repository of image worden ingevuld. Docker/Portainer-beheerders kunnen container-omgevingsvariabelen inzien. Honeywell-sessietokens worden via `/app/.session.json` opgeslagen in het gegevensvolume. De huidige Compose-file houdt de inlogvelden expliciet leeg en de provider op mock.
+Honeywell-gebruikersnaam en wachtwoord horen in Portainer-stackvariabelen. Ze mogen niet in deze repository of image worden ingevuld. Docker/Portainer-beheerders kunnen container-omgevingsvariabelen inzien. Honeywell-sessietokens worden via `/app/.session.json` opgeslagen in het gegevensvolume met bestandsrechten 0600. Bij een ander account worden bestaande tokens niet hergebruikt.
+
+## Je eigen account toevoegen
+
+Open in Portainer **Stacks → evoweb-git → Edit stack settings → Environment variables**. Vul zelf de volgende waarden in:
+
+| Variabele | Waarde |
+| --- | --- |
+| `HEATING_PROVIDER` | `honeywell` voor je eigen installatie; `mock` voor de proef |
+| `HONEYWELL_USERNAME` | Je Honeywell/Evohome-gebruikersnaam |
+| `HONEYWELL_PASSWORD` | Je bestaande Honeywell/Evohome-wachtwoord |
+| `EVOWEB_WEB_USERNAME` | Gebruikersnaam voor de editor, standaard `evohome` |
+| `EVOWEB_WEB_PASSWORD` | Een apart wachtwoord van minstens 16 tekens; gebruik hier niet het Honeywell-wachtwoord |
+
+Kies **Save settings** met **Redeploy** aangevinkt. Open daarna de editor eerst in een apart browservenster en meld je aan met `EVOWEB_WEB_USERNAME` en `EVOWEB_WEB_PASSWORD`. Dit aanmeldvenster vraagt niet om je Honeywell-wachtwoord. De indicator toont **LIVE · Honeywell** bij de echte provider en **DEMO** bij voorbeeldgegevens. Opslaan in live-modus wijzigt het echte schema.
+
+Je kunt gegevens alvast invullen terwijl `HEATING_PROVIDER=mock` blijft staan, mits ook het aparte webwachtwoord is ingesteld. Mock-modus maakt geen cloudverbinding. Zonder de vereiste velden start live-modus niet; bij een mislukte Honeywell-aanmelding wordt de fout gemeld zonder wachtwoorden/tokens in de logs en verschijnt er geen misleidend demoschema als vervanging.
+
+Een browser kan een aanmeldvenster in het HA-iframe blokkeren. Gebruik dan de link om de editor apart te openen. Voor HTTPS achter een proxy kan `EVOWEB_PUBLIC_ORIGIN` worden ingesteld op de externe oorsprong, bijvoorbeeld `https://evohome.example.nl` (zonder pad). Het aanmeldwachtwoord wordt met HTTP Basic Authentication verzonden; HTTPS is nodig op een niet-vertrouwd netwerk. Er is tijdens ontwikkeling geen echte Honeywell-aanmelding getest.
 
 ## Portainer
 
@@ -46,7 +65,7 @@ De Dockerfile bevat een HTTP-healthcheck; de container hoort na starten **health
 
 ## Beveiligingscorrecties
 
-Op 17 november 2026 zijn onder andere axios, body-parser, form-data, follow-redirects, ip-address, proxy-addr en qs bijgewerkt. Een gerichte override verhelpt daarnaast de minimatch-melding bij nodemon. De applicatiebron zelf is overgenomen van de genoemde upstream-revisie; bron- en lockfilehistorie zijn zichtbaar in Git.
+Op 17 november 2026 zijn onder andere axios, body-parser, form-data, follow-redirects, ip-address, proxy-addr en qs bijgewerkt. Een gerichte override verhelpt daarnaast de minimatch-melding bij nodemon. De daaropvolgende live-configuratie voegt de webaanmelding en privacycontroles toe; bron- en lockfilehistorie zijn zichtbaar in Git.
 
 Een npm-controle dekt bekende npm-kwetsbaarheden, niet alle Linux-pakketten of onbekende fouten. De image moet regelmatig opnieuw worden gebouwd met actuele afhankelijkheden.
 
