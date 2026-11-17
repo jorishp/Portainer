@@ -32,6 +32,8 @@ Open in Portainer **Stacks → evoweb-git → Edit stack settings → Environmen
 | `EVOWEB_WEB_USERNAME` | Gebruikersnaam voor de editor, standaard `evohome` |
 | `EVOWEB_WEB_PASSWORD` | Een apart wachtwoord van minstens 16 tekens; gebruik hier niet het Honeywell-wachtwoord |
 
+In Portainer worden dollartekens door Docker Compose verwerkt. Schrijf in de stackvariabelen ieder letterlijk `$` als `$$`; de container ontvangt dan één `$`. Dit geldt ook voor wachtwoorden. Bij aanmelden in de browser gebruik je het oorspronkelijke wachtwoord met één `$`. Controleer bij een melding over een te kort webwachtwoord dus ook de Compose-notatie. Zie [Docker Compose: interpolation](https://docs.docker.com/reference/compose-file/interpolation/).
+
 Kies **Save settings** met **Redeploy** aangevinkt. Open daarna de editor eerst in een apart browservenster en meld je aan met `EVOWEB_WEB_USERNAME` en `EVOWEB_WEB_PASSWORD`. Dit aanmeldvenster vraagt niet om je Honeywell-wachtwoord. De indicator toont **LIVE · Honeywell** bij de echte provider en **DEMO** bij voorbeeldgegevens. Opslaan in live-modus wijzigt het echte schema.
 
 Je kunt gegevens alvast invullen terwijl `HEATING_PROVIDER=mock` blijft staan, mits ook het aparte webwachtwoord is ingesteld. Mock-modus maakt geen cloudverbinding. Zonder de vereiste velden start live-modus niet; bij een mislukte Honeywell-aanmelding wordt de fout gemeld zonder wachtwoorden/tokens in de logs en verschijnt er geen misleidend demoschema als vervanging.
