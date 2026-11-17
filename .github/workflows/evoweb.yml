@@ -7,6 +7,7 @@ on:
       - 'evoweb/source/**'
       - 'evoweb/smoke-test.cjs'
       - 'evoweb/security-smoke-test.cjs'
+      - 'evoweb/failed-login-test.cjs'
       - 'evoweb/VERSION'
       - '.github/workflows/evoweb.yml'
   pull_request:
@@ -14,6 +15,7 @@ on:
       - 'evoweb/source/**'
       - 'evoweb/smoke-test.cjs'
       - 'evoweb/security-smoke-test.cjs'
+      - 'evoweb/failed-login-test.cjs'
       - 'evoweb/VERSION'
       - '.github/workflows/evoweb.yml'
   workflow_dispatch:
@@ -88,6 +90,17 @@ jobs:
           fi
           grep -q EVOWEB_WEB_PASSWORD guard.log
 
+      - name: Test failed login without real cloud calls
+        run: |
+          docker run --detach --name evoweb-failed-login-ci \
+            --env HEATING_PROVIDER=honeywell \
+            --env HONEYWELL_USERNAME=fixture-user --env HONEYWELL_PASSWORD=fixture-password \
+            --env HONEYWELL_URL_DOMAIN=http://127.0.0.1:4444 \
+            --env EVOWEB_WEB_PASSWORD=ci-only-not-a-real-secret \
+            --env MQTT_RECONNECT_PERIOD=0 --entrypoint node "$IMAGE:sha-$GITHUB_SHA" \
+            -e 'let requests=0; require("http").createServer((req,res)=>{ res.setHeader("Content-Type","application/json"); if(req.url==="/count"){res.end(JSON.stringify({requests}));return;} requests++; res.statusCode=401; res.end("{}"); }).listen(4444,"127.0.0.1",()=>require("./dist/index.js"));'
+          docker exec --interactive evoweb-failed-login-ci node < evoweb/failed-login-test.cjs
+
       - name: Publish tested image
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
@@ -102,7 +115,8 @@ jobs:
         run: |
           docker logs evoweb-ci || true
           docker logs evoweb-auth-ci || true
+          docker logs evoweb-failed-login-ci || true
 
       - name: Stop CI demo
         if: always()
-        run: docker rm --force evoweb-ci evoweb-auth-ci || true
+        run: docker rm --force evoweb-ci evoweb-auth-ci evoweb-failed-login-ci || true

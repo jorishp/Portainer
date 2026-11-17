@@ -10,8 +10,11 @@ import { MockProvider } from './providers/MockProvider';
 import { validateLiveConfiguration, webAccess } from './utils/WebAccess';
 
 validateLiveConfiguration(config.providerType, config.honeywell.username, config.honeywell.password, config.webAccess);
+let initializationError: string | null = null;
 const app = express();
-app.get('/healthz', (_req, res) => { res.json({ status: 'ok' }); });
+app.get('/healthz', (_req, res) => {
+    res.status(initializationError ? 503 : 200).json({ status: initializationError ? 'unavailable' : 'ok' });
+});
 app.use(webAccess(config.webAccess));
 
 // --- Provider instances ---
@@ -96,13 +99,19 @@ async function initAllProviders(): Promise<void> {
 }
 
 initAllProviders().catch(error => {
+    initializationError = 'Aanmelden bij de verwarmingsprovider is mislukt. Controleer de gegevens in Portainer en werk de stack opnieuw bij.';
     Logger.error('Provider initialization failed.', error);
-    process.exit(1);
+    // Stay available to report the error. Exiting would make Docker retry a bad
+    // cloud password repeatedly, potentially triggering account rate limits.
 });
 
 // --- Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/rest', (_req, res, next) => {
+    if (initializationError) { res.status(503).json({ error: initializationError }); return; }
+    next();
+});
 
 app.use((req, res, next) => {
     Logger.debug(`${req.method} ${req.url}`);

@@ -111,7 +111,7 @@ export const useHeatingApi = () => {
       setSystem(response.data.system || null);
       setError(null);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch status');
+      setError(err.response?.data?.error || err.message || 'Failed to fetch status');
     } finally {
       setLoading(false);
     }

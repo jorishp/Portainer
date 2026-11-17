@@ -40,6 +40,8 @@ Een browser kan een aanmeldvenster in het HA-iframe blokkeren. Gebruik dan de li
 
 ## Portainer
 
+Bij een mislukte Honeywell-aanmelding blijft de app beschikbaar om de fout te melden en krijgt de container de status unhealthy. Er volgt geen automatische reeks nieuwe aanmeldpogingen. Corrigeer de gegevens en kies bewust opnieuw **Redeploy**. De controles gebruiken hiervoor een lokale testserver en benaderen nooit Honeywell met testgegevens.
+
 - Stack: `evoweb-git`.
 - Repository: `https://github.com/jorishp/Portainer`.
 - Referentie: `refs/heads/main`.

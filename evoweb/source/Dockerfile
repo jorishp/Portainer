@@ -22,8 +22,8 @@ RUN npm run build
 FROM node:22-slim
 LABEL org.opencontainers.image.title="evoweb" \
       org.opencontainers.image.description="evoWeb Heating Schedule Manager" \
-      org.opencontainers.image.version="0.9.4-live20261117-1" \
-      org.opencontainers.image.revision="05f2f7280f3b0be30e2a768771b2aee7bc74261c+live-config-20261117-1"
+      org.opencontainers.image.version="0.9.4-live20261117-2" \
+      org.opencontainers.image.revision="05f2f7280f3b0be30e2a768771b2aee7bc74261c+live-config-20261117-2"
 WORKDIR /app
 
 # Copy backend dependencies
