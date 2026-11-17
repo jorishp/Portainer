@@ -1,6 +1,6 @@
 services:
   evoweb:
-    image: ghcr.io/jorishp/evoweb:0.9.4-live20261117-1
+    image: ghcr.io/jorishp/evoweb:0.9.4-live20261117-2
     pull_policy: always
     container_name: evoweb-git
     restart: unless-stopped
